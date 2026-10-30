@@ -78,8 +78,10 @@ def score_event(event: dict) -> Tuple[float, str]:
         # Typical range is roughly -0.5 to 0.5
         anomaly_score = max(0.0, min(1.0, 0.5 - raw_score))
 
-        if prediction == -1:
+        if prediction == -1 and anomaly_score > 0.65:
             explanation = f"ML anomaly detected (score={anomaly_score:.2f}, raw={raw_score:.3f})"
+        elif prediction == -1:
+            explanation = f"ML: atypical pattern (score={anomaly_score:.2f}, raw={raw_score:.3f})"
         else:
             explanation = f"ML: normal behavior (score={anomaly_score:.2f})"
 

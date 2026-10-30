@@ -25,19 +25,13 @@ def generate_normal_data(n_samples: int = 2000) -> np.ndarray:
     data = []
     for _ in range(n_samples):
         event_type = rng.choice([0, 1, 2], p=[0.5, 0.3, 0.2]) / 2.0
-        pid = rng.uniform(0.01, 0.5)          # normal PIDs
-        ppid = rng.uniform(0.01, 0.3)
-        uid = 0.0                              # normal: non-root
-        exe_length = rng.uniform(0.05, 0.25)   # normal path lengths
-        args_length = rng.uniform(0.0, 0.15)   # short args
-        has_container = 1.0                     # inside container
-        slash_count = rng.uniform(0.05, 0.2)   # normal path depth
-
-        # Add some variance
-        if rng.random() < 0.2:
-            uid = 0.0  # some root processes are normal (e.g., nginx master)
-        if rng.random() < 0.1:
-            args_length = rng.uniform(0.15, 0.3)  # occasionally longer args
+        pid = rng.uniform(0.001, 0.4)          # normal PIDs (50 to 26000)
+        ppid = rng.uniform(0.00001, 0.01)     # normal PPIDs (1 to 650, typical for container workloads)
+        uid = 1.0 if rng.random() < 0.05 else 0.0  # predominantly non-root, occasional root service
+        exe_length = rng.uniform(0.05, 0.25)   # standard path lengths (/usr/bin/..., /usr/sbin/...)
+        args_length = rng.uniform(0.0, 0.20)   # standard arguments length
+        has_container = 1.0                    # container execution
+        slash_count = rng.choice([0.0, 0.05, 0.1, 0.15], p=[0.4, 0.3, 0.2, 0.1])  # 0 to 3 slashes in args
 
         data.append([event_type, pid, ppid, uid, exe_length, args_length, has_container, slash_count])
 

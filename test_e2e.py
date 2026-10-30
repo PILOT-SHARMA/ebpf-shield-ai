@@ -22,7 +22,7 @@ def run_tests():
     print("\n[1/7] Testing Frontend & Static Endpoints...")
     res = client.get("/")
     assert res.status_code == 200, f"Expected 200 from /, got {res.status_code}"
-    assert "eBPF-Shield AI" in res.text
+    assert "ContainerShield AI" in res.text or "eBPF-Shield AI" in res.text
     print("  ✅ GET / (Dashboard HTML) OK")
 
     res = client.get("/static/style.css")

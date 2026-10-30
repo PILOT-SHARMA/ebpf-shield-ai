@@ -1,5 +1,5 @@
 """
-main.py — FastAPI application for eBPF-Shield AI.
+main.py — FastAPI application for ContainerShield AI.
 Owner: Aryan Gupta (backend)
 
 API endpoints:
@@ -66,15 +66,15 @@ COLLECTOR_MODE = os.environ.get("COLLECTOR_MODE", "replay").upper()
 async def lifespan(app: FastAPI):
     """Initialize database on startup."""
     init_db()
-    print("✅ eBPF-Shield AI backend started")
+    print("✅ ContainerShield AI backend started")
     print(f"🔧 Collector Mode: {'DEMO_REPLAY_MODE' if COLLECTOR_MODE == 'REPLAY' else 'LIVE_EBPF_MODE'}")
     print("📊 Dashboard: http://localhost:8000")
     print("📡 API docs:  http://localhost:8000/docs")
     yield
 
 app = FastAPI(
-    title="eBPF-Shield AI",
-    description="Kernel-Level Cloud-Native Runtime Threat & Container Escape Engine",
+    title="ContainerShield AI",
+    description="AI-Powered Container Security Monitoring and Anomaly Detection Platform",
     version="1.0.0",
     lifespan=lifespan,
 )

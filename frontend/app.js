@@ -1,5 +1,5 @@
 /**
- * app.js — eBPF-Shield AI Runtime Threat Intelligence Dashboard
+ * app.js — ContainerShield AI: AI-Powered Container Security Monitoring Platform
  * Owner: Ananya Mishra (frontend / QA)
  *
  * Full SPA controller for all 8 views, live WebSocket streaming,
@@ -1095,7 +1095,7 @@ function updateClock() {
 // ──────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🛡️ Initializing eBPF-Shield AI Dashboard...');
+    console.log('🛡️ Initializing ContainerShield AI Dashboard...');
 
     // Live clock
     setInterval(updateClock, 1000);

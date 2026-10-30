@@ -1,0 +1,17 @@
+# ──────────────────────────────────────────────
+# Dockerfile — eBPF-Shield AI Collector (Replay Mode)
+# Sends realistic telemetry events to the backend
+# ──────────────────────────────────────────────
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install minimal deps
+RUN pip install --no-cache-dir httpx>=0.24.0
+
+# Copy collector script
+COPY collector/ ./collector/
+COPY replay.py .
+
+# Start collector
+CMD ["python", "collector/collector_service.py"]

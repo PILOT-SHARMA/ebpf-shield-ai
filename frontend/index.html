@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="eBPF-Shield AI: Kernel-Level Cloud-Native Runtime Threat & Container Escape Detection Dashboard">
+    <title>eBPF-Shield AI — Runtime Threat & Container Escape Detection</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🛡️</text></svg>">
+</head>
+<body>
+    <div class="app-layout">
+
+        <!-- ── Sidebar Navigation ── -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-logo">🛡️</div>
+                <div class="brand-text">
+                    <span class="brand-name">eBPF-Shield AI</span>
+                    <span class="brand-version">v1.0 • 70% MVP</span>
+                </div>
+            </div>
+
+            <div class="sidebar-nav">
+                <button class="nav-item active" onclick="showView('overview')" id="nav-overview">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-label">Overview</span>
+                </button>
+                <button class="nav-item" onclick="showView('monitoring')" id="nav-monitoring">
+                    <span class="nav-icon">📡</span>
+                    <span class="nav-label">Runtime Monitoring</span>
+                </button>
+                <button class="nav-item" onclick="showView('detection')" id="nav-detection">
+                    <span class="nav-icon">⚔️</span>
+                    <span class="nav-label">Threat Detection</span>
+                </button>
+                <button class="nav-item" onclick="showView('alerts')" id="nav-alerts">
+                    <span class="nav-icon">🚨</span>
+                    <span class="nav-label">Security Alerts</span>
+                    <span class="nav-badge" id="navThreatBadge" style="display:none;">0</span>
+                </button>
+                <button class="nav-item" onclick="showView('analytics')" id="nav-analytics">
+                    <span class="nav-icon">🧠</span>
+                    <span class="nav-label">AI Analytics</span>
+                </button>
+                <button class="nav-item" onclick="showView('containers')" id="nav-containers">
+                    <span class="nav-icon">📦</span>
+                    <span class="nav-label">Container Monitoring</span>
+                </button>
+                <button class="nav-item" onclick="showView('timeline')" id="nav-timeline">
+                    <span class="nav-icon">🕐</span>
+                    <span class="nav-label">Event Timeline</span>
+                </button>
+                <button class="nav-item" onclick="showView('health')" id="nav-health">
+                    <span class="nav-icon">💚</span>
+                    <span class="nav-label">System Health</span>
+                </button>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="mode-badge" id="modeBadge">
+                    <span class="pulse-icon">⟳</span>
+                    <span id="modeBadgeText">DEMO REPLAY MODE</span>
+                </div>
+                <div id="connectionStatus" class="connection-indicator disconnected">
+                    <span class="dot"></span>
+                    <span id="connectionText">Connecting…</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- ── Main Content Area ── -->
+        <main class="main-content">
+
+            <!-- ── Topbar ── -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <h2 id="viewTitle">Overview Dashboard</h2>
+                    <span class="topbar-subtitle" id="viewSubtitle">Real-time kernel runtime threat intelligence</span>
+                </div>
+                <div class="topbar-center">
+                    <div class="env-banner" id="envBanner">
+                        <span class="env-tag">DEMO / REPLAY</span>
+                        <span>Simulated eBPF kernel telemetry (macOS Host Environment)</span>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <button class="btn btn-ghost btn-sm" onclick="refreshCurrentView()" title="Refresh View">↻ Refresh</button>
+                    <div class="topbar-time" id="currentTime">--:--:-- UTC</div>
+                </div>
+            </header>
+
+            <!-- ══════════════════════════════════════ -->
+            <!-- 1. VIEW: Overview Dashboard            -->
+            <!-- ══════════════════════════════════════ -->
+            <div class="view active" id="view-overview">
+                <!-- Stats KPI Grid -->
+                <section class="stats-grid" id="statsGrid">
+                    <div class="stat-card" onclick="showView('monitoring')">
+                        <div class="stat-icon">📡</div>
+                        <div class="stat-value" id="statTotalEvents">0</div>
+                        <div class="stat-label">Total Events Ingested</div>
+                        <div class="stat-trend" id="trendEvents">Live stream active</div>
+                    </div>
+                    <div class="stat-card warning" onclick="showView('monitoring')">
+                        <div class="stat-icon">⚠️</div>
+                        <div class="stat-value" id="statSuspicious">0</div>
+                        <div class="stat-label">Suspicious Events</div>
+                        <div class="stat-trend" id="trendSuspicious">Flagged by Engine</div>
+                    </div>
+                    <div class="stat-card danger" id="alertCard" onclick="showView('alerts')">
+                        <div class="stat-icon">🚨</div>
+                        <div class="stat-value" id="statOpenAlerts">0</div>
+                        <div class="stat-label">Open Alerts</div>
+                        <div class="stat-trend" id="trendAlerts">Requires Analyst Action</div>
+                    </div>
+                    <div class="stat-card critical" onclick="showView('alerts')">
+                        <div class="stat-icon">🔴</div>
+                        <div class="stat-value" id="statCritical">0</div>
+                        <div class="stat-label">Critical / High Threats</div>
+                        <div class="stat-trend" id="trendCritical">Elevated Risk</div>
+                    </div>
+                    <div class="stat-card info" onclick="showView('containers')">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-value" id="statContainers">0</div>
+                        <div class="stat-label">Containers Monitored</div>
+                        <div class="stat-trend" id="trendContainers">Active Workloads</div>
+                    </div>
+                </section>
+
+                <!-- Overview Main Grid -->
+                <section class="overview-grid">
+                    <!-- Live Events Preview -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>📋 Recent Ingested Events <span class="count-badge" id="overviewEventCount">0</span></h3>
+                            <button class="btn btn-ghost btn-sm" onclick="showView('monitoring')">View All →</button>
+                        </div>
+                        <div class="panel-body" id="overviewEventsList" style="max-height:360px; overflow-y:auto;">
+                            <div class="empty-state"><div class="icon">📡</div><p>Waiting for events from collector…</p></div>
+                        </div>
+                    </div>
+
+                    <!-- Active Alerts Preview -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>🚨 Active Security Alerts <span class="count-badge" id="overviewAlertCount">0</span></h3>
+                            <button class="btn btn-ghost btn-sm" onclick="showView('alerts')">Triage Center →</button>
+                        </div>
+                        <div class="panel-body" id="overviewAlertsList" style="max-height:360px; overflow-y:auto;">
+                            <div class="empty-state"><div class="icon">🛡️</div><p>No active alerts. System healthy.</p></div>
+                        </div>
+                    </div>
+
+                    <!-- Threat Severity Distribution -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>📊 Threat Severity Distribution</h3>
+                            <span class="panel-note">Real-time counts</span>
+                        </div>
+                        <div class="panel-body chart-body" id="threatDistChart">
+                            <div class="empty-state"><div class="icon">📊</div><p>Calculating distribution…</p></div>
+                        </div>
+                    </div>
+
+                    <!-- Detection Methods Breakdown -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>🧠 Detection Engine Coverage</h3>
+                            <span class="panel-note">Rule vs ML vs Hybrid</span>
+                        </div>
+                        <div class="panel-body chart-body" id="detectionMethodsChart">
+                            <div class="empty-state"><div class="icon">🧠</div><p>Evaluating models…</p></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ══════════════════════════════════════ -->
+            <!-- 2. VIEW: Runtime Monitoring            -->
+            <!-- ══════════════════════════════════════ -->
+            <div class="view" id="view-monitoring">
+                <section class="panel full-panel">
+                    <div class="panel-header">
+                        <div class="panel-title-group">
+                            <h3>📡 Runtime Kernel Telemetry Events <span class="count-badge" id="eventCount">0</span></h3>
+                            <span class="stream-indicator"><span class="pulse-dot"></span> LIVE FEED</span>
+                        </div>
+                        <div class="panel-controls">
+                            <input type="text" id="eventSearchInput" class="search-input" placeholder="Filter by executable, pod, pid, args..." oninput="filterEventsSearch()">
+                            <div class="panel-tabs">
+                                <button class="panel-tab active" onclick="filterEvents('all')">All</button>
+                                <button class="panel-tab" onclick="filterEvents('suspicious')">Suspicious Only</button>
+                                <button class="panel-tab" onclick="filterEvents('process_exec')">Process</button>
+                                <button class="panel-tab" onclick="filterEvents('file_open')">File</button>
+                                <button class="panel-tab" onclick="filterEvents('net_connect')">Network</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body scrollable" id="eventsList" style="max-height: 700px;">
+                        <div class="empty-state">
+                            <div class="icon">📡</div>
+                            <p>Connecting to backend telemetry stream…<br>Events from the collector service will appear here in real time.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ══════════════════════════════════════ -->
+            <!-- 3. VIEW: Threat Detection Architecture -->
+            <!-- ══════════════════════════════════════ -->
+            <div class="view" id="view-detection">
+                <section class="detection-intro-panel">
+                    <div class="detection-hero">
+                        <div class="hero-badge">DUAL-LAYER THREAT DETECTION ENGINE</div>
+                        <h2>Kernel-Level Heuristic Rules + Machine Learning Isolation Forest</h2>
+                        <p>Combines deterministic container escape signatures with unsupervised anomaly detection to score every runtime kernel event in milliseconds.</p>
+                    </div>
+                    <div class="detection-formula-cards">
+                        <div class="formula-card">
+                            <div class="formula-title">Layer 1: Heuristic Rules</div>
+                            <div class="formula-desc">Inspects syscall arguments, executable basenames, sensitive file targets, reverse shell sockets, and escape tools.</div>
+                            <div class="formula-score">Rule Score: 0.0 — 1.0</div>
+                        </div>
+                        <div class="formula-card">
+                            <div class="formula-title">Layer 2: Isolation Forest</div>
+                            <div class="formula-desc">Evaluates 8 normalized runtime features: process hierarchy, root privileges, args length, path depth, and container flags.</div>
+                            <div class="formula-score">ML Anomaly Score: 0.0 — 1.0</div>
+                        </div>
+                        <div class="formula-card highlight">
+                            <div class="formula-title">Layer 3: Hybrid Scoring</div>
+                            <div class="formula-desc">Computes final composite threat score. Elevates suspicious threshold above 0.60 to generate actionable alerts.</div>
+                            <div class="formula-score">Final Verdict: Safe / Suspicious</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel" style="margin-top: 20px;">
+                    <div class="panel-header">
+                        <h3>⚔️ Active Detection Rules Catalog</h3>
+                        <span class="panel-note" id="rulesCountBadge">7 Registered Heuristics</span>
+                    </div>
+                    <div class="rules-grid" id="rulesGrid">
+                        <!-- Populated by JavaScript from /api/v1/rules -->
+                        <div class="empty-state"><div class="icon">⚔️</div><p>Loading detection rules…</p></div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ══════════════════════════════════════ -->
+            <!-- 4. VIEW: Security Alerts Triage        -->
+            <!-- ══════════════════════════════════════ -->
+            <div class="view" id="view-alerts">
+                <section class="panel full-panel">
+                    <div class="panel-header">
+                        <div class="panel-title-group">
+                            <h3>🚨 Security Alerts & Incident Response <span class="count-badge" id="alertCount">0</span></h3>
+                        </div>
+                        <div class="panel-controls">
+                            <div class="panel-tabs">
+                                <button class="panel-tab active" onclick="filterAlerts('all')">All Severities</button>
+                                <button class="panel-tab tab-critical" onclick="filterAlerts('critical')">Critical</button>
+                                <button class="panel-tab tab-high" onclick="filterAlerts('high')">High</button>
+                                <button class="panel-tab tab-medium" onclick="filterAlerts('medium')">Medium</button>
+                                <button class="panel-tab tab-low" onclick="filterAlerts('low')">Low</button>
+                            </div>
+                            <div class="panel-tabs" style="margin-left: 10px;">
+                                <button class="panel-tab active" onclick="filterAlertStatus('all')">All Status</button>
+                                <button class="panel-tab" onclick="filterAlertStatus('open')">Open</button>
+                                <button class="panel-tab" onclick="filterAlertStatus('acknowledged')">Acknowledged</button>
+                                <button class="panel-tab" onclick="filterAlertStatus('resolved')">Resolved</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body scrollable" id="alertsList" style="max-height: 700px;">
+                        <div class="empty-state">
+                            <div class="icon">🛡️</div>
+                            <p>No alerts recorded yet<br>Suspicious events will trigger alerts here automatically</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ══════════════════════════════════════ -->
+            <!-- 5. VIEW: AI Analytics                  -->
+            <!-- ══════════════════════════════════════ -->
+            <div class="view" id="view-analytics">
+                <section class="analytics-grid">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>📊 Events Volume by Syscall Type</h3>
+                        </div>
+                        <div class="panel-body chart-body" id="eventTypeChart">
+                            <div class="empty-state"><div class="icon">📊</div><p>Loading analytics…</p></div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>🎯 Alerts by Severity Rating</h3>
+                        </div>
+                        <div class="panel-body chart-body" id="severityChart">
+                            <div class="empty-state"><div class="icon">🎯</div><p>Loading analytics…</p></div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>📈 Real-time Threat Score Trajectory</h3>
+                        </div>
+                        <div class="panel-body chart-body" id="threatScoreChart">
+                            <div class="empty-state"><div class="icon">📈</div><p>Streaming scores…</p></div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>🏆 Top Triggered Security Rules</h3>
+                        </div>
+                        <div class="panel-body" id="topRulesPanel" style="max-height: 280px; overflow-y:auto;">
+                            <div class="empty-state"><div class="icon">🏆</div><p>No rule matches yet</p></div>
+                        </div>
+                    </div>
+
+                    <div class="panel span-2">
+                        <div class="panel-header">
+                            <h3>🧠 Machine Learning Anomaly Score Distribution (Isolation Forest)</h3>
+                            <span class="panel-note">Histogram bins for 0.0 to 1.0 threat scores</span>
+                        </div>
+                        <div class="panel-body" id="scoreHistogramPanel">
+                            <div class="empty-state"><div class="icon">🧠</div><p>Compiling anomaly predictions…</p></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ══════════════════════════════════════ -->
+            <!-- 6. VIEW: Container Monitoring          -->
+            <!-- ══════════════════════════════════════ -->
+            <div class="view" id="view-containers">
+                <section class="panel full-panel">
+                    <div class="panel-header">
+                        <div class="panel-title-group">
+                            <h3>📦 Monitored Container Workloads <span class="count-badge" id="containerCount">0</span></h3>
+                            <span class="panel-note">Tracked across cluster namespaces and worker nodes</span>
+                        </div>
+                        <div class="panel-controls">
+                            <button class="btn btn-ghost btn-sm" onclick="loadContainers()">↻ Refresh Workloads</button>
+                        </div>
+                    </div>
+                    <div class="panel-body" id="containersContainer">
+                        <div class="containers-grid" id="containersList">
+                            <div class="empty-state">
+                                <div class="icon">📦</div>
+                                <p>No containers registered yet<br>Containers appear as telemetry events are ingested from pods.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ══════════════════════════════════════ -->
+            <!-- 7. VIEW: Event Timeline                -->
+            <!-- ══════════════════════════════════════ -->
+            <div class="view" id="view-timeline">
+                <section class="panel full-panel">
+                    <div class="panel-header">
+                        <div class="panel-title-group">
+                            <h3>🕐 Chronological Security Event Timeline</h3>
+                            <span class="panel-note">Correlation of kernel events, triggered alerts, and automated responses</span>
+                        </div>
+                        <div class="panel-controls">
+                            <button class="btn btn-ghost btn-sm" onclick="loadTimeline()">↻ Refresh Timeline</button>
+                        </div>
+                    </div>
+                    <div class="panel-body scrollable" style="max-height: 720px;">
+                        <div class="timeline-container" id="timelineList">
+                            <div class="empty-state">
+                                <div class="icon">🕐</div>
+                                <p>No events in timeline yet<br>Activity will be charted chronologically as events arrive.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ══════════════════════════════════════ -->
+            <!-- 8. VIEW: System Health & Audit Log     -->
+            <!-- ══════════════════════════════════════ -->
+            <div class="view" id="view-health">
+                <section class="health-grid" id="healthGrid">
+                    <div class="health-card" id="healthBackend">
+                        <div class="health-card-header">
+                            <div class="health-icon">🖥️</div>
+                            <span class="health-badge healthy" id="healthBackendBadge">HEALTHY</span>
+                        </div>
+                        <div class="health-name">FastAPI Backend</div>
+                        <div class="health-detail" id="healthBackendDetail">Port 8000 • Connected</div>
+                    </div>
+
+                    <div class="health-card" id="healthDatabase">
+                        <div class="health-card-header">
+                            <div class="health-icon">🗄️</div>
+                            <span class="health-badge healthy" id="healthDatabaseBadge">CONNECTED</span>
+                        </div>
+                        <div class="health-name">PostgreSQL Database</div>
+                        <div class="health-detail" id="healthDatabaseDetail">Port 5432 • Persistent Volume</div>
+                    </div>
+
+                    <div class="health-card" id="healthCollector">
+                        <div class="health-card-header">
+                            <div class="health-icon">📡</div>
+                            <span class="health-badge replay" id="healthCollectorBadge">REPLAY MODE</span>
+                        </div>
+                        <div class="health-name">Telemetry Sensor</div>
+                        <div class="health-detail" id="healthCollectorDetail">macOS Docker • Replay Ingest Active</div>
+                    </div>
+
+                    <div class="health-card" id="healthML">
+                        <div class="health-card-header">
+                            <div class="health-icon">🧠</div>
+                            <span class="health-badge healthy" id="healthMLBadge">LOADED</span>
+                        </div>
+                        <div class="health-name">Isolation Forest Model</div>
+                        <div class="health-detail" id="healthMLDetail">isolation_forest_v1 • 100 Trees</div>
+                    </div>
+
+                    <div class="health-card" id="healthWebSocket">
+                        <div class="health-card-header">
+                            <div class="health-icon">🔌</div>
+                            <span class="health-badge healthy" id="healthWSBadge">STREAMING</span>
+                        </div>
+                        <div class="health-name">WebSocket Channels</div>
+                        <div class="health-detail" id="healthWSDetail">/ws/v1/stream • Real-time Broadcast</div>
+                    </div>
+
+                    <div class="health-card" id="healthDocker">
+                        <div class="health-card-header">
+                            <div class="health-icon">🐳</div>
+                            <span class="health-badge healthy" id="healthDockerBadge">COMPOSE</span>
+                        </div>
+                        <div class="health-name">Docker Services</div>
+                        <div class="health-detail" id="healthDockerDetail">4 Services • Networked</div>
+                    </div>
+                </section>
+
+                <!-- Health Diagnostic Details -->
+                <section class="panel" style="margin-top:20px;">
+                    <div class="panel-header">
+                        <h3>📋 Detailed System Telemetry & Diagnostic Status</h3>
+                        <button class="btn btn-ghost btn-sm" onclick="checkHealth()">↻ Check Diagnostics</button>
+                    </div>
+                    <div class="panel-body" id="healthDetails">
+                        <div class="empty-state"><div class="icon">💚</div><p>Checking system health…</p></div>
+                    </div>
+                </section>
+
+                <!-- Audit Log Section -->
+                <section class="panel" style="margin-top:20px;">
+                    <div class="panel-header">
+                        <h3>📝 Immutable Security Audit Trail <span class="count-badge" id="auditCount">0</span></h3>
+                        <button class="btn btn-ghost btn-sm" onclick="refreshAuditLog()">↻ Refresh Trail</button>
+                    </div>
+                    <div class="panel-body scrollable" id="auditList" style="max-height: 280px;">
+                        <div class="empty-state"><div class="icon">📝</div><p>No audit trail records yet.</p></div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ── Application Footer ── -->
+            <footer class="footer">
+                <div class="footer-content">
+                    <span><strong>eBPF-Shield AI v1.0 (70% MVP)</strong> — Arpit Sharma, Aryan Gupta, Ananya Mishra — GLA University</span>
+                    <span class="footer-disclaimer">⚡ Replay Telemetry Mode: macOS Host environment. Live eBPF kernel probes require Linux kernel with BPF support.</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- ── Alert Investigation & Response Modal ── -->
+    <div class="modal-overlay" id="alertModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <span class="modal-icon">🔍</span>
+                    <div>
+                        <h3 id="modalAlertTitle">Alert Investigation & Evidence</h3>
+                        <span class="modal-subtitle" id="modalAlertSubtitle">Forensic deep-dive & container mitigation</span>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeAlertModal()">✕</button>
+            </div>
+            <div class="modal-body" id="alertModalBody">
+                <!-- Dynamically populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

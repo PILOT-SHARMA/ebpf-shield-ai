@@ -70,7 +70,7 @@ flowchart TD
 
 ### 3.1 Telemetry Collector (`collector/collector_service.py`)
 - **Execution Mode**: Runs autonomously as a background Docker service (`ebpf-shield-collector`).
-- **Telemetry Generation**: Simulates production container workloads across Kubernetes-style namespaces (`production`, `staging`, `monitoring`, `kube-system`).
+- **Telemetry Generation**: Simulates container workloads across simulated demo workload groups (`production`, `staging`, `monitoring`).
 - **Event Models**:
   - `process_exec`: Process spawns, binary path, argument vector, PID, PPID, UID.
   - `file_open`: System file inspection, credential dumps, container escape targets.

@@ -37,11 +37,11 @@ let currentMetrics = null;
 const VIEW_METADATA = {
     overview: {
         title: 'Overview Dashboard',
-        subtitle: 'Executive runtime threat landscape & telemetry overview',
+        subtitle: 'Executive container security threat landscape & replay telemetry overview',
     },
     monitoring: {
-        title: 'Runtime Kernel Telemetry',
-        subtitle: 'Real-time eBPF event stream (process, file, network)',
+        title: 'Runtime Telemetry Stream',
+        subtitle: 'Replay-generated telemetry stream (process, file, network syscall-like events)',
     },
     detection: {
         title: 'Threat Detection Architecture',
@@ -49,23 +49,23 @@ const VIEW_METADATA = {
     },
     alerts: {
         title: 'Security Alerts & Incident Response',
-        subtitle: 'Triage desk, forensic evidence, and container mitigations',
+        subtitle: 'Triage desk, forensic evidence, and simulated container mitigations',
     },
     analytics: {
         title: 'AI Analytics & Anomaly Scores',
         subtitle: 'Statistical distributions, threat trajectories, and engine coverage',
     },
     containers: {
-        title: 'Container Workload Monitoring',
-        subtitle: 'Container inventory, namespace context, and risk levels',
+        title: 'Simulated Container Workloads',
+        subtitle: 'Simulated container inventory, demo workload groups, and risk levels',
     },
     timeline: {
         title: 'Event Correlation Timeline',
-        subtitle: 'Chronological timeline of threats, alerts, and mitigations',
+        subtitle: 'Chronological timeline of threats, alerts, and simulated mitigations',
     },
     health: {
-        title: 'System Health & Audit Trail',
-        subtitle: 'Service health checks, collector mode, and compliance log',
+        title: 'System Health & Security Audit Log',
+        subtitle: 'Service health checks, collector mode, and security audit trail log',
     },
 };
 
@@ -697,15 +697,19 @@ function openAlertModal(alertId) {
 
         <div id="modalResponseResult" style="display:none;"></div>
 
+        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px; border-left: 2px solid var(--accent-amber); padding-left: 8px;">
+            ⚠️ <strong>Simulation Notice</strong>: All mitigation actions are simulated for demonstration and do not alter host containers.
+        </div>
+
         <div class="mitigation-actions">
             <button class="btn btn-danger btn-sm" onclick="triggerResponseAction('${alertObj.id}', 'isolate_pod')">
-                🛡️ Isolate Pod (Network Policy)
+                🛡️ Simulated Workload Isolation
             </button>
             <button class="btn btn-danger btn-sm" onclick="triggerResponseAction('${alertObj.id}', 'terminate_container')">
-                🛑 Terminate Container
+                🛑 Terminate Container (Simulated)
             </button>
             <button class="btn btn-ghost btn-sm" onclick="triggerResponseAction('${alertObj.id}', 'quarantine')">
-                📦 Quarantine Namespace
+                📦 Quarantine Workload (Simulated)
             </button>
             <button class="btn btn-ack btn-sm" onclick="changeAlertStatus('${alertObj.id}', 'resolved')">
                 ✓ Mark Resolved

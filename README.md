@@ -94,20 +94,20 @@ flowchart TD
    - **Isolation Forest ML Model**: Detects zero-day anomalies across process hierarchy, argument length, and root privilege flags.
    - **Hybrid Scoring**: Combines rule confidence with machine learning scores to eliminate blind spots.
 2. **Autonomous Telemetry Generation**:
-   - Background worker synthesizes microservices traffic across namespaces (`production`, `monitoring`, `kube-system`).
+   - Background worker synthesizes microservices traffic across simulated demo workload groups (`production`, `staging`, `monitoring`).
    - Injects realistic attack scenarios every 4 cycles to test detection efficacy.
 3. **Enterprise PostgreSQL Persistence**:
    - ACID-compliant relational store across 6 tables with non-destructive migrations.
-   - Preserves all event history, forensic evidence, and audit trails across container restarts via Docker volume `pgdata`.
+   - Preserves all event history, forensic evidence, and audit logs across container restarts via Docker volume `pgdata`.
 4. **Real-Time SOC Dashboard (8 Functional Views)**:
    - **Overview**: Executive threat landscape and system KPIs.
    - **Runtime Monitoring**: Live event feed with dynamic search and filtering.
    - **Threat Detection**: Visual representation of the dual-layer architecture and active rules.
    - **Security Alerts**: Alert triage desk with forensic JSON inspection modals.
    - **AI Analytics**: Histograms of threat distributions and syscall volume.
-   - **Container Monitoring**: Workload risk inventory tracking namespaces, nodes, and threat tiers.
+   - **Container Monitoring**: Workload risk inventory tracking simulated container groups and threat tiers.
    - **Event Timeline**: Chronological correlation stream linking events to incidents.
-   - **System Health**: Health diagnostic indicators and immutable audit trail.
+   - **System Health**: Health diagnostic indicators and append-only security audit trail log.
 5. **Simulated Incident Response**:
    - Safe `[SIMULATED]` mitigations (`isolate_pod`, `terminate_container`, `quarantine`) with automatic audit trail logging.
 
@@ -196,7 +196,7 @@ All screenshots below were captured directly from the live working application r
 
 ### 8. System Diagnostics & Audit Trail
 ![System Health](docs/screenshots/system_health.png)
-*Service health monitoring (FastAPI, PostgreSQL, Sensor, Nginx) and immutable compliance audit trail.*
+*Service health monitoring (FastAPI, PostgreSQL, Collector, Nginx) and security audit trail log.*
 
 ---
 
@@ -253,7 +253,7 @@ python3 test_e2e.py
 
 Expected output:
 ```text
-🧪 Running eBPF-Shield AI End-to-End Validation Suite...
+🧪 Running ContainerShield AI End-to-End Validation Suite...
 [1/7] Testing Frontend & Static Endpoints...          ✅ PASS
 [2/7] Testing Normal Event Ingestion...               ✅ PASS
 [3/7] Testing Attack Event Ingestion (Rule R001)...    ✅ PASS
@@ -266,8 +266,10 @@ Expected output:
 [10/11] Testing GET /api/v1/containers...              ✅ PASS
 [11/11] Testing Metrics Summary & Alert ACK...         ✅ PASS
 [Bonus] Testing WebSocket live streaming endpoint...   ✅ PASS
+[12/13] Testing Individual Heuristic Rules (R001–R007) ✅ PASS
+[13/13] Testing Isolation Forest ML Anomaly Scoring... ✅ PASS
 ============================================================
-🎉 ALL TESTS PASSED! All Phase 1 & 2 requirements verified.
+🎉 ALL TESTS PASSED! All ContainerShield AI validation phases verified.
 ============================================================
 ```
 

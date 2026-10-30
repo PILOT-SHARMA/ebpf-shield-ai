@@ -81,7 +81,7 @@ Open your browser to: **`http://localhost:3000`**
    - **Recommended Action**: Explains why container isolation is suggested.
 4. **Demonstrate Incident Triage**:
    - Click **Acknowledge Alert**. Note that the status transitions to `acknowledged`.
-   - Click **Isolate Pod (Simulate)**.
+   - Click **Simulated Workload Isolation**.
    - Notice the green confirmation message:
      `[SIMULATED] Pod compromised-pod-test network policy applied — isolated from cluster network`.
    - Close the modal.
@@ -105,9 +105,9 @@ Open your browser to: **`http://localhost:3000`**
 
 ---
 
-### Step 7: System Diagnostics & Immutable Audit Trail (1 Minute)
+### Step 7: System Diagnostics & Security Audit Trail Log (1 Minute)
 1. Click **System Health**:
-   - Show all service indicators: FastAPI Backend (Healthy), PostgreSQL 16 (Healthy), Telemetry Sensor (Active / Replay), Nginx (Healthy).
+   - Show all service indicators: FastAPI Backend (Healthy), PostgreSQL 16 (Healthy), Telemetry Collector (Active / Replay), Nginx (Healthy).
 2. **Inspect the Audit Trail**:
    - Point out the recent acknowledgment and simulated response records.
    - Show that actor name, timestamp, action type, and target alert ID are permanently recorded in PostgreSQL.
@@ -135,11 +135,11 @@ To prove that all telemetry and triage data persists across system restarts:
 
 ## 3. Anticipated Questions & Strong Answers
 
-**Q: Why does the system run in Replay Telemetry Mode instead of using live eBPF probes?**  
+**Q: Why does the system run in Replay Telemetry Mode instead of using live eBPF probes?**
 > *"Live eBPF kernel instrumentation requires a native Linux kernel with `libbpf` and `CAP_BPF` privileges. Development and testing on macOS (Darwin kernel) do not support Linux BPF syscalls directly. By engineering a high-fidelity Telemetry Collector in `DEMO_REPLAY_MODE`, we demonstrate the entire detection engine, ML inference pipeline, database persistence, and SOC dashboard reliably and reproducibly on any workstation."*
 
-**Q: Is the container actually killed when I click 'Isolate Pod'?**  
+**Q: Is the container actually killed when I click 'Simulated Workload Isolation'?**
 > *"No. The platform deliberately operates in `[SIMULATED]` mitigation mode to ensure safe demonstration without disrupting the user's Docker environment or killing running containers. The action triggers the full approval gate, response logging, and audit trail record exactly as a real SOC tool would."*
 
-**Q: How does the Isolation Forest contribute if heuristic rules exist?**  
+**Q: How does the Isolation Forest contribute if heuristic rules exist?**
 > *"Heuristic rules are deterministic and capture known signatures (e.g. `nsenter`). The Isolation Forest evaluates an 8-dimensional feature vector (PID depth, path length, argument complexity, root flag) to identify anomalous behaviors that don't match any static rule (zero-day activity). It also boosts the confidence score of matched rules in our hybrid combiner."*

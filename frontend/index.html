@@ -341,8 +341,8 @@
                 <section class="panel full-panel">
                     <div class="panel-header">
                         <div class="panel-title-group">
-                            <h3>📦 Monitored Container Workloads <span class="count-badge" id="containerCount">0</span></h3>
-                            <span class="panel-note">Tracked across cluster namespaces and worker nodes</span>
+                            <h3>📦 Simulated Container Workload Inventory <span class="count-badge" id="containerCount">0</span></h3>
+                            <span class="panel-note">Demo workload groups tracked across simulated microservices and namespaces</span>
                         </div>
                         <div class="panel-controls">
                             <button class="btn btn-ghost btn-sm" onclick="loadContainers()">↻ Refresh Workloads</button>
@@ -412,7 +412,7 @@
                             <div class="health-icon">📡</div>
                             <span class="health-badge replay" id="healthCollectorBadge">REPLAY MODE</span>
                         </div>
-                        <div class="health-name">Telemetry Sensor</div>
+                        <div class="health-name">Telemetry Collector</div>
                         <div class="health-detail" id="healthCollectorDetail">macOS Docker • Replay Ingest Active</div>
                     </div>
 
@@ -458,7 +458,7 @@
                 <!-- Audit Log Section -->
                 <section class="panel" style="margin-top:20px;">
                     <div class="panel-header">
-                        <h3>📝 Immutable Security Audit Trail <span class="count-badge" id="auditCount">0</span></h3>
+                        <h3>📝 Security Audit Trail Log <span class="count-badge" id="auditCount">0</span></h3>
                         <button class="btn btn-ghost btn-sm" onclick="refreshAuditLog()">↻ Refresh Trail</button>
                     </div>
                     <div class="panel-body scrollable" id="auditList" style="max-height: 280px;">
@@ -485,7 +485,7 @@
                     <span class="modal-icon">🔍</span>
                     <div>
                         <h3 id="modalAlertTitle">Alert Investigation & Evidence</h3>
-                        <span class="modal-subtitle" id="modalAlertSubtitle">Forensic deep-dive & container mitigation</span>
+                        <span class="modal-subtitle" id="modalAlertSubtitle">Forensic deep-dive & simulated workload mitigation</span>
                     </div>
                 </div>
                 <button class="modal-close" onclick="closeAlertModal()">✕</button>
